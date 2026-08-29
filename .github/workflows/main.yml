@@ -167,6 +167,8 @@ jobs:
         F=esp-idf/components/mbedtls/mbedtls_v3/port/include/mbedtls/esp_config.h
         sed -i 's|^#endif /\* ESP_CONFIG_H \*/|#undef MBEDTLS_ARIA_C\n#undef MBEDTLS_SEED_C\n#undef MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED\n#undef MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED\n#undef MBEDTLS_KEY_EXCHANGE_RSA_ENABLED\n#endif /* ESP_CONFIG_H */|' $F
         tail -7 $F
+        grep -rln "define MBEDTLS_ARIA_C" esp-idf/components/mbedtls/mbedtls_v3/mbedtls/include/mbedtls/ | while read f; do sed -i 's|^#define MBEDTLS_ARIA_C|/* disabled for fingerprint experiment */|' $f; echo "patched: $f"; done || true
+        grep -rln "define MBEDTLS_SEED_C" esp-idf/components/mbedtls/mbedtls_v3/mbedtls/include/mbedtls/ | while read f; do sed -i 's|^#define MBEDTLS_SEED_C|/* disabled for fingerprint experiment */|' $f; echo "patched: $f"; done || true
       shell: bash
     - name: Install dependencies
       env:
