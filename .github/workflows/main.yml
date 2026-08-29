@@ -162,6 +162,12 @@ jobs:
         echo -e "{\"platform\": \"PLATFORM_ESP8266\", \"module\": \"ESP8266_1MB\", \"silence\": 0}" > build/module_info.json
         ./build.py reconfigure || echo "skip exception"
       shell: bash
+    - name: normalize TLS ClientHello (drop ARIA/SEED/DHE/static-RSA via esp_config patch)
+      run: |
+        F=esp-idf/components/mbedtls/mbedtls_v3/port/include/mbedtls/esp_config.h
+        sed -i 's|^#endif /\* ESP_CONFIG_H \*/|#undef MBEDTLS_ARIA_C\n#undef MBEDTLS_SEED_C\n#undef MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED\n#undef MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED\n#undef MBEDTLS_KEY_EXCHANGE_RSA_ENABLED\n#endif /* ESP_CONFIG_H */|' $F
+        tail -7 $F
+      shell: bash
     - name: Install dependencies
       env:
         IDF_PATH: ${{ github.workspace }}/esp-idf
